@@ -61,7 +61,9 @@ Selecting part of rows based on some column
 
 ```
 df.loc[df['column_name'] == some_value]
+df.loc[df['Percetage'].between(60,75)]['Roll NO'].count()
 df.loc[(df['column_name'] >= A) & (df['column_name'] <= B)]
+df.query('100 >= Percentage >= 75')
 ```
 
 
@@ -120,4 +122,26 @@ Converting to Datetime
 ```
 from datetime import datetime 
 df['Date'] = pd.to_datetime(df['Date'])
+```
+
+Plotting in pandas
+
+```python
+# The Pandas Plot Function
+df.plot(
+    x=None,         # Values to use for x axis
+    y=None,         # Values to use for y axis
+    kind='line',    # The type of chart to make
+    title=None,     # The title to use
+    legend=False,   # Whether to show a legend
+    xlabel=None,    # What the x-axis label should be
+    ylabel=None     # What the y-axis label should be
+    c=None,         # The color to use for the dots
+    s=None          # How to size dots (single number or column)
+)
+```
+
+Making Histogram of a Column in Pandas
+```
+df['Total'].hist(bins=10, alpha=0.8)
 ```
