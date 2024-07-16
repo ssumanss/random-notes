@@ -1,3 +1,10 @@
+
+---
+layout: default
+title: Deploy Flask
+nav_order: 10
+---
+
 # How to Deploy Your Flask App Using Gunicorn and Nginx on a Linux Server
 
 Are you ready to take your Flask application from development to production? Deploying your Flask app using Gunicorn and Nginx on a Linux server is a robust way to serve your web application efficiently. This tutorial will walk you through the steps needed to get your Flask app up and running on a Linux server.
