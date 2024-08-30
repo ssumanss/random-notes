@@ -1,0 +1,196 @@
+
+---
+layout: default
+title: Go PDF
+nav_order: 11
+---
+
+
+# How to Generate PDFs from HTML in Go using WeasyPrint
+
+In web development, generating PDFs from HTML templates can be incredibly useful—whether for invoices, reports, or dynamically generated documents. While Go offers several libraries for PDF generation, sometimes you need more robust CSS support. Enter **WeasyPrint**, a powerful Python-based tool for converting HTML and CSS to PDFs. In this tutorial, we'll walk through how to integrate WeasyPrint into a Go application.
+
+## Why WeasyPrint?
+
+WeasyPrint is a modern HTML-to-PDF converter with strong support for CSS, making it a great choice for web developers looking for precise rendering of web content in PDF format. Unlike some other solutions, WeasyPrint excels at handling complex CSS layouts, media queries, and even advanced typography. 
+
+## Prerequisites
+
+To follow along, you’ll need:
+
+1. **Go installed** on your system.
+2. **Python installed**, as WeasyPrint is a Python-based tool.
+3. **WeasyPrint installed**, which we'll cover in the next section.
+
+## Step 1: Install WeasyPrint
+
+First, you'll need to install WeasyPrint on your system. It requires Python and can be easily installed using `pip`:
+
+```bash
+pip3 install WeasyPrint
+```
+
+For macOS users, ensure you have Python installed via Homebrew:
+
+```bash
+brew install python3
+pip3 install WeasyPrint
+```
+
+On Ubuntu/Debian:
+
+```bash
+sudo apt-get install -y python3-pip
+pip3 install WeasyPrint
+```
+
+Verify that WeasyPrint is installed by running:
+
+```bash
+weasyprint --version
+```
+
+If you see the version number, you’re good to go!
+
+## Step 2: Set Up Your Go Project
+
+Now, let’s create a simple Go project. Start by initializing a Go module:
+
+```bash
+mkdir weasyprint-go-pdf
+cd weasyprint-go-pdf
+go mod init weasyprint-go-pdf
+```
+
+Next, create a basic HTML template. We’ll use Go’s `html/template` package to generate HTML dynamically.
+
+### Create an HTML Template
+
+Create a file called `template.html`:
+
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ .Title }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; }
+        h1 { color: #333; }
+        p { font-size: 14px; }
+    </style>
+</head>
+<body>
+    <h1>{{ .Title }}</h1>
+    <p>{{ .Body }}</p>
+</body>
+</html>
+```
+
+This template will be used to render the content dynamically in Go.
+
+## Step 3: Write the Go Code
+
+Now, let’s dive into the Go code. The goal is to generate an HTML file from the template and convert it to a PDF using WeasyPrint.
+
+### Create a Go File
+
+Create a file called `main.go`:
+
+```go
+package main
+
+import (
+    "bytes"
+    "html/template"
+    "log"
+    "os"
+    "os/exec"
+    "io/ioutil"
+)
+
+type PDFData struct {
+    Title string
+    Body  string
+}
+
+func main() {
+    // Define the data for the template
+    data := PDFData{
+        Title: "PDF from HTML Template using WeasyPrint",
+        Body:  "This PDF was generated using WeasyPrint and an HTML template in Go.",
+    }
+
+    // Parse and execute the template
+    tmpl, err := template.ParseFiles("template.html")
+    if err != nil {
+        log.Fatalf("Error parsing template: %v", err)
+    }
+
+    var buffer bytes.Buffer
+    if err := tmpl.Execute(&buffer, data); err != nil {
+        log.Fatalf("Error executing template: %v", err)
+    }
+
+    // Write the HTML content to a temporary file
+    htmlFile, err := ioutil.TempFile("", "temp*.html")
+    if err != nil {
+        log.Fatalf("Error creating temp HTML file: %v", err)
+    }
+    defer os.Remove(htmlFile.Name())  // Clean up temp file afterwards
+
+    _, err = htmlFile.Write(buffer.Bytes())
+    if err != nil {
+        log.Fatalf("Error writing HTML to file: %v", err)
+    }
+
+    htmlFile.Close()
+
+    // Define the output PDF file name
+    pdfFile := "output.pdf"
+
+    // Use WeasyPrint to convert HTML to PDF
+    cmd := exec.Command("weasyprint", htmlFile.Name(), pdfFile)
+    err = cmd.Run()
+    if err != nil {
+        log.Fatalf("Error generating PDF with WeasyPrint: %v", err)
+    }
+
+    log.Printf("PDF generated successfully: %s\n", pdfFile)
+}
+```
+
+### Code Breakdown
+
+1. **Template Parsing:** We use Go’s `html/template` package to parse the `template.html` file and render it with the data defined in the `PDFData` struct.
+
+2. **Temporary HTML File:** The rendered HTML content is written to a temporary file, which WeasyPrint will use as input.
+
+3. **WeasyPrint Command:** We use the `exec.Command` function to invoke WeasyPrint from Go. This converts the HTML file to a PDF and saves it as `output.pdf`.
+
+4. **Error Handling and Cleanup:** Proper error handling is included to catch any issues during the template parsing, file writing, or PDF generation. The temporary HTML file is deleted after the PDF is generated.
+
+## Step 4: Run Your Go Application
+
+With everything set up, it's time to run your Go application. In your terminal, navigate to the project directory and run:
+
+```bash
+go run main.go
+```
+
+If everything is configured correctly, you should see a new file called `output.pdf` in your project directory. Open it to see the generated PDF!
+
+## Customization
+
+Want to customize the PDF further? WeasyPrint supports various CSS features, so you can adjust the styling in the HTML template to control the layout, typography, and more. You can also modify the Go code to generate more complex PDFs based on different templates or data sources.
+
+## Conclusion
+
+Integrating WeasyPrint into your Go application provides a powerful way to generate high-quality PDFs from HTML templates. Whether you’re generating invoices, reports, or any other type of document, WeasyPrint offers the modern CSS support you need to make your PDFs look great.
+
+By following this tutorial, you've set up a Go application that can dynamically generate PDFs using WeasyPrint. With this foundation, you can expand and customize your application to fit your specific needs.
+
+---
+
+Feel free to adjust the styling, content, or code snippets according to your specific use case or preferences! This tutorial should serve as a solid starting point for Go developers looking to leverage WeasyPrint for PDF generation.
