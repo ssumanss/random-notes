@@ -1,3 +1,10 @@
+---
+layout: default
+title: Registry
+nav_order: 11
+---
+
+
 # 🔐 Running a Local Docker Registry Over HTTPS with Podman (Raspberry Pi / Linux)
 
 This guide walks you through setting up a local container registry with **TLS/HTTPS** using **Podman**, and ensures it **automatically restarts after reboot**.
